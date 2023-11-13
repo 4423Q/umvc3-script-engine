@@ -70,6 +70,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetExt>.asi</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetExt>.asi</TargetExt>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -108,10 +114,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;UMVC3SCRIPTENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LUA_BUILD_AS_DLL=1;_CRT_SECURE_NO_WARNINGS=1;_DEBUG;UMVC3SCRIPTENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>D:\repos\umvc3-script-engine\lib\lua-5.4.6\src;D:\repos\umvc3-script-engine\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -125,10 +133,12 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;UMVC3SCRIPTENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LUA_BUILD_AS_DLL=1;_CRT_SECURE_NO_WARNINGS=1;NDEBUG;UMVC3SCRIPTENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>D:\repos\umvc3-script-engine\lib\lua-5.4.6\src;D:\repos\umvc3-script-engine\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,16 +150,83 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lapi.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lauxlib.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lcode.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lctype.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\ldebug.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\ldo.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lfunc.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lgc.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\ljumptab.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\llex.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\llimits.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lmem.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lobject.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lopcodes.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lopnames.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lparser.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lprefix.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lstate.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lstring.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\ltable.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\ltm.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lua.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lua.hpp" />
+    <ClInclude Include="lib\lua-5.4.6\src\luaconf.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lualib.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lundump.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lvm.h" />
+    <ClInclude Include="lib\lua-5.4.6\src\lzio.h" />
+    <ClInclude Include="lib\MemoryMgr.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="umvc3utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="lib\lua-5.4.6\src\lapi.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lauxlib.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lbaselib.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lcode.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lcorolib.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lctype.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\ldblib.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\ldebug.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\ldo.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\ldump.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lfunc.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lgc.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\linit.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\liolib.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\llex.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lmathlib.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lmem.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\loadlib.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lobject.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lopcodes.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\loslib.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lparser.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lstate.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lstring.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lstrlib.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\ltable.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\ltablib.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\ltm.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\luac.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lundump.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lutf8lib.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lvm.c" />
+    <ClCompile Include="lib\lua-5.4.6\src\lzio.c" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="umvc3utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lib\lua-5.4.6\src\Makefile" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
