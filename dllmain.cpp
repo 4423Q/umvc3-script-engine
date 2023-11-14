@@ -6,6 +6,8 @@
 #define SOL_ALL_SAFTIES_ON 1
 #include <sol/sol.hpp>
 #include "umvc3utils.h"
+#include "UMvC3.h"
+
 
 struct sBattleSetting {
     void* vtable;
@@ -23,19 +25,35 @@ struct sBattleSetting {
     character characters[6];
     char pad2[0x104];
     INT32 battle_type;
-    char pad3[0x21];
+    std::byte battle_flag_0;
+    std::byte battle_flag_1;
+    std::byte battle_flag_2;
+    std::byte battle_flag;
+    std::byte unknown_0;
+    std::byte unknown_1;
+    std::byte unknown_2;
+    std::byte stage_id;
+    INT32 mTimeLimit; //??? really
+    std::byte pad4[0x3];
+    std::byte round_max;
+    std::byte pad5[0x3];
+    std::byte cpu_level; //Not sure about this...
+    std::byte pad3[11];
+    std::byte arcade_dif;
+    std::byte battle_ui_disp;
     std::byte input_key_disp;
     std::byte finish_picture_save;
     std::byte replay_use;
     std::byte damage_disp;
 };
 
-sBattleSetting* getBattleSetting() {
- sBattleSetting* battleSetting = *reinterpret_cast<sBattleSetting**>(_addr(0x140d50e58));
+
+
+sBattleSetting* getBattleSetting()
+{
+    sBattleSetting* battleSetting = *reinterpret_cast<sBattleSetting**>(_addr(0x140d50e58));
     return battleSetting;
 }
-
-
 
 DWORD WINAPI Initialise(LPVOID lpreserved) {
     sol::state lua;
@@ -59,8 +77,15 @@ DWORD WINAPI Initialise(LPVOID lpreserved) {
         */
     lua.new_usertype<sBattleSetting>("sBattleSetting",
         "battle_type", &sBattleSetting::battle_type,
+        "battle_ui_disp", &sBattleSetting::battle_ui_disp,
+        "arcade_dif", &sBattleSetting::arcade_dif,
+        "battle_flag", &sBattleSetting::battle_flag,
+        "stage_id", &sBattleSetting::stage_id,
+        "mTimeLimit", &sBattleSetting::mTimeLimit,
         "input_key_disp", &sBattleSetting::input_key_disp,
         "damage_disp", &sBattleSetting::damage_disp,
+        "replay_use", &sBattleSetting::replay_use,
+        "finish_picture_save",&sBattleSetting::finish_picture_save,
         "characters", sol::property([](sBattleSetting& c) { return std::ref(c.characters); })
         );
 

@@ -1,4 +1,5 @@
 #include "umvc3utils.h"
+#include "UMvC3.h"
 #include "MemoryMgr.h"
 
 int64 GetUMvC3EntryPoint()
