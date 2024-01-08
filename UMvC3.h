@@ -121,6 +121,43 @@ struct cChrInput {
 };
 
 
+struct sBattleSetting {
+    void* vtable;
+    char pad[0x30];
+    struct character {
+        void* vtable;
+        INT32 mTeam;
+        INT32 mType;
+        INT32 unknown;
+        INT32 mBody;
+        INT32 mCpu;
+        INT32 assist;
+        char pad[0x38];
+    };
+    character characters[6];
+    char pad2[0x104];
+    INT32 battle_type;
+    INT8 battle_flag_0;
+    INT8 battle_flag_1;
+    INT8 battle_flag_2;
+    INT8 battle_flag;
+    INT8 unknown_0;
+    INT8 unknown_1;
+    INT8 unknown_2;
+    INT8 stage_id;
+    INT32 mTimeLimit; //??? really
+    INT8 pad4[0x3];
+    INT8 round_max;
+    INT8 pad5[0x3];
+    INT8 cpu_level; //Not sure about this...
+    INT8 pad3[11];
+    INT8 arcade_dif;
+    INT8 battle_ui_disp;
+    INT8 input_key_disp;
+    INT8 finish_picture_save;
+    INT8 replay_use;
+    INT8 damage_disp;
+};
 
 
 struct uCharacter {
@@ -226,5 +263,20 @@ struct sAction {
     INT32 mStepTime2;
     INT32 mStepTimeWin;
     INT32 mStepFrame;
-    char pad2[0x15c];
+    INT32 mRound;
+
+    INT32 mRTimeLimit;
+    INT32 mRTimePass;
+    INT32 mRTimePass2;
+    INT32 mTimePass;
+    INT32 mHitAfter;
+    INT32 mNoInputRestart;
+    INT32 mFinishWatch;
+    INT32 mWinTeam;
+    INT32 mRestartMode;
+    INT32 mBtnRestart;
+    pointer mpActionParam;
+
+
+    char pad2[0x12c];
 }; 
