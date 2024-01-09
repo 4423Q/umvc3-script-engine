@@ -180,6 +180,7 @@
     <ClInclude Include="lib\lua-5.4.6\src\lvm.h" />
     <ClInclude Include="lib\lua-5.4.6\src\lzio.h" />
     <ClInclude Include="lib\MemoryMgr.h" />
+    <ClInclude Include="lib\Trampoline.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="UMvC3.h" />
     <ClInclude Include="umvc3utils.h" />

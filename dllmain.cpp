@@ -2,11 +2,23 @@
 #include "pch.h"
 #include "MemoryMgr.h"
 #include <string>
+#include <string_view>
 #include <iostream>
 #define SOL_ALL_SAFTIES_ON 1
 #include <sol/sol.hpp>
 #include "umvc3utils.h"
 #include "UMvC3.h"
+#include <mutex>
+#include "Trampoline.h"
+#include "MemoryMgr.h"
+#include <WinUser.h>
+#include <map>
+#include <filesystem>
+namespace fs = std::filesystem;
+
+sol::state lua;
+std::mutex lua_mutex;
+std::map<std::string, sol::table> modules;
 
 sAction* getSAction()
 {
@@ -19,6 +31,7 @@ sBattleSetting* getBattleSetting()
     sBattleSetting* battleSetting = *reinterpret_cast<sBattleSetting**>(_addr(0x140d50e58));
     return battleSetting;
 }
+
 
 void typeLuaSBattleSetting(sol::state* lua) {
 
@@ -75,41 +88,120 @@ void typeLuaSAction(sol::state* lua) {
 
 }
 
+BYTE oldKeyState[256];
+
+void OnPostInput(uCharacter* character) {
+    
+    BYTE keyState[256];
+    int temp;
+    int temp2;
+
+    if (character->mTeamId != 0) return; // This is a lazy way to do keyboard input
+
+    memset(keyState, 0, sizeof(256));
+    GetKeyState(0);
+    if (GetKeyboardState(keyState)) {
+        for (int i = 0; i < 256; i++)
+        {
+            temp = (int)keyState[i];
+            temp >>= 7;
+            temp2 = (int)oldKeyState[i];
+            temp2 >>= 7;
+            if (temp != 0 && temp2 == 0) {
+                lua_mutex.lock();
+                for (const auto& [name, table] : modules) {
+
+                    sol::optional<sol::function> onkeydown = table["unstable_onkeyboarddown"];
+                    if (onkeydown != sol::nullopt) {
+                        onkeydown.value()(i);
+                    }
+                }
+                lua_mutex.unlock();
+            }
+            oldKeyState[i] = keyState[i];
+        }
+    }
+    else {
+        printf("Error getting keyboard state");
+    }
+    
+}
+
+int HookPostInputUpdate(uCharacter* character) {
+    OnPostInput(character);
+
+    return character->mTeamId;
+}
+
+void InstallInputHook()
+{
+    Trampoline* tramp = Trampoline::MakeTrampoline(GetModuleHandle(nullptr));
+    Memory::VP::InjectHook(_addr(0x14002e280), tramp->Jump(HookPostInputUpdate), PATCH_CALL);
+}
+
+void registerModule(std::string name, sol::table mod) {
+    printf("Loading module %s\n", name.c_str());
+    modules[name] = mod;
+}
+
 DWORD WINAPI Initialise(LPVOID lpreserved) {
-    sol::state lua;
+    memset(oldKeyState, 0, sizeof(256));
 
-    AllocConsole();
-
-    freopen("CONIN$", "r", stdin);
-    freopen("CONOUT$", "w", stdout);
-    freopen("CONOUT$", "w", stderr);
-
+    lua_mutex.lock();
     lua.open_libraries(sol::lib::base);
 
+    lua["umse_register_module"] = registerModule;
     typeLuaSBattleSetting(&lua);
     typeLuaSAction(&lua);
 
     try {
-        lua.safe_script_file("config.lua");
-    } catch (const sol::error& e) {
-            std::cout << "Error loading config: " << e.what() << std::endl;
+        lua.safe_script_file("umse/config.lua");
     }
-    
+    catch (const sol::error& e) {
+        std::cout << "Error loading config: " << e.what() << std::endl;
+    }
+
     auto display = lua.get_or<bool>("_UmSE_DISPLAY", 0);
 
     std::cout << "Display:" << display;
     if (display == 1) {
         std::cout << "Display === 1" << std::endl;
+
+        AllocConsole();
+
+        freopen("CONIN$", "r", stdin);
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
     }
+
+
+    std::string path = "umse/scripts";
+    for (const auto& entry : fs::directory_iterator(path))
+    {
+        std::string filename = entry.path().filename().string();
+        std::string::size_type n = filename.find(".lua", filename.length() - 4);
+        if (n != std::string::npos) {
+           
+           printf("Loading script, %s\n",filename.c_str());
+           lua.safe_script_file(entry.path().string());
+        }
+    }
+
+    lua_mutex.unlock();
+
+    InstallInputHook();
 
     printf("UMvC3 Script Engine Activated! :)\n");
     for (std::string line; std::getline(std::cin, line);) {
         try {
+            lua_mutex.lock();
             auto result1 = lua.safe_script(line);
         }
         catch (const sol::error& e) {
             std::cout << "an expected error has occurred: " << e.what() << std::endl;
         }
+
+        lua_mutex.unlock();
     }
 
     return TRUE;
